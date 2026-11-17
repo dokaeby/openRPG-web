@@ -1,5 +1,11 @@
 import { getClass, getRace } from "../data";
 import type { BaseStats, ClassId, RaceId } from "../data";
+import {
+  enemyTurn,
+  playerAttack,
+  startCombat,
+} from "./combat";
+import type { CombatState } from "./combat";
 import { EventBus } from "./eventBus";
 import { addExp, computeMaxHp, computeMaxMp } from "./progression";
 
@@ -32,6 +38,7 @@ export interface GameStateData {
   player: PlayerState | null;
   questStates: Record<string, QuestState>;
   settings: { muted: boolean; uiScale: number };
+  combat: CombatState | null;
 }
 
 export type GameAction =
@@ -43,7 +50,10 @@ export type GameAction =
       key: keyof GameStateData["settings"];
       value: number | boolean;
     }
-  | { type: "addExp"; amount: number };
+  | { type: "addExp"; amount: number }
+  | { type: "startCombat"; monsterIds: string[] }
+  | { type: "combatPlayerAttack"; targetId: string }
+  | { type: "combatEnemyTurn" };
 
 const STAT_KEYS: (keyof BaseStats)[] = [
   "hp",
@@ -62,6 +72,7 @@ export class GameState {
     player: null,
     questStates: {},
     settings: { muted: false, uiScale: 1 },
+    combat: null,
   };
 
   get data(): GameStateData {
@@ -95,6 +106,12 @@ export class GameState {
         return undefined;
       case "addExp":
         return addExp(this, action.amount);
+      case "startCombat":
+        return startCombat(this, action.monsterIds);
+      case "combatPlayerAttack":
+        return playerAttack(this, action.targetId);
+      case "combatEnemyTurn":
+        return enemyTurn(this);
     }
   }
 
