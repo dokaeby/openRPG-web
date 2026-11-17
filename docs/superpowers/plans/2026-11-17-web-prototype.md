@@ -8,7 +8,7 @@
 
 **Tech Stack:** Vite, TypeScript (strict), Three.js, zod, idb-keyval, Vitest, pnpm
 
-**Spec:** `openRPG/docs/00_기본설계서_개요.md`, `openRPG/docs/02_게임플레이_시스템.md`, `openRPG/docs/05_기술_선택_로드맵.md`
+**Spec:** `openRPG-web/docs/00_기본설계서_개요.md`, `openRPG-web/docs/02_게임플레이_시스템.md`, `openRPG-web/docs/05_기술_선택_로드맵.md`
 
 ## Global Constraints
 
@@ -33,9 +33,9 @@
 ### Task 1: 프로젝트 스캐폴드
 
 **Files:**
-- Create: `openRPG/package.json`, `openRPG/tsconfig.json`, `openRPG/vite.config.ts`, `openRPG/vitest.config.ts`, `openRPG/index.html`, `openRPG/eslint.config.js`, `openRPG/.gitignore`
-- Create: `openRPG/src/main.ts`, `openRPG/src/app.ts` (빈 부트스트랩)
-- Create: `openRPG/tests/setup.ts`
+- Create: `openRPG-web/package.json`, `openRPG-web/tsconfig.json`, `openRPG-web/vite.config.ts`, `openRPG-web/vitest.config.ts`, `openRPG-web/index.html`, `openRPG-web/eslint.config.js`, `openRPG-web/.gitignore`
+- Create: `openRPG-web/src/main.ts`, `openRPG-web/src/app.ts` (빈 부트스트랩)
+- Create: `openRPG-web/tests/setup.ts`
 
 **Interfaces:**
 - Produces: `pnpm dev`로 Vite 개발 서버 실행, `pnpm test`로 Vitest 실행, `pnpm build`로 빌드.
@@ -85,9 +85,9 @@ git add -A && git commit -m "chore: scaffold vite+typescript+three.js project"
 ### Task 2: 코어 데이터 타입과 스키마 (종족/클래스/스탯)
 
 **Files:**
-- Create: `openRPG/src/core/types.ts`
-- Create: `openRPG/src/data/races.ts`, `openRPG/src/data/classes.ts`, `openRPG/src/data/index.ts`
-- Test: `openRPG/tests/core/types.test.ts`
+- Create: `openRPG-web/src/core/types.ts`
+- Create: `openRPG-web/src/data/races.ts`, `openRPG-web/src/data/classes.ts`, `openRPG-web/src/data/index.ts`
+- Test: `openRPG-web/tests/core/types.test.ts`
 
 **Interfaces:**
 - Produces:
@@ -152,9 +152,9 @@ git add -A && git commit -m "feat: add race/class data types and schemas"
 ### Task 3: EventBus + GameState
 
 **Files:**
-- Create: `openRPG/src/core/eventBus.ts`
-- Create: `openRPG/src/core/gameState.ts`
-- Test: `openRPG/tests/core/eventBus.test.ts`, `openRPG/tests/core/gameState.test.ts`
+- Create: `openRPG-web/src/core/eventBus.ts`
+- Create: `openRPG-web/src/core/gameState.ts`
+- Test: `openRPG-web/tests/core/eventBus.test.ts`, `openRPG-web/tests/core/gameState.test.ts`
 
 **Interfaces:**
 - Consumes: Task 2의 `RaceId`, `ClassId`, `BaseStats`.
@@ -232,9 +232,9 @@ git add -A && git commit -m "feat: add event bus and game state core"
 ### Task 4: 레벨/경험치 시스템
 
 **Files:**
-- Create: `openRPG/src/core/progression.ts`
-- Modify: `openRPG/src/core/gameState.ts` (액션 추가)
-- Test: `openRPG/tests/core/progression.test.ts`
+- Create: `openRPG-web/src/core/progression.ts`
+- Modify: `openRPG-web/src/core/gameState.ts` (액션 추가)
+- Test: `openRPG-web/tests/core/progression.test.ts`
 
 **Interfaces:**
 - Consumes: Task 3의 `GameState`, `PlayerState`.
@@ -298,10 +298,10 @@ git add -A && git commit -m "feat: add level/exp progression system"
 ### Task 5: 세미리얼 ATB 전투 코어
 
 **Files:**
-- Create: `openRPG/src/core/combat.ts`
-- Create: `openRPG/src/data/monsters.ts`
-- Modify: `openRPG/src/core/gameState.ts` (`combatState` 추가, 액션 추가)
-- Test: `openRPG/tests/core/combat.test.ts`
+- Create: `openRPG-web/src/core/combat.ts`
+- Create: `openRPG-web/src/data/monsters.ts`
+- Modify: `openRPG-web/src/core/gameState.ts` (`combatState` 추가, 액션 추가)
+- Test: `openRPG-web/tests/core/combat.test.ts`
 
 **Interfaces:**
 - Consumes: Task 3 `GameState`/`EventBus`, Task 2 `BaseStats`.
@@ -392,8 +392,8 @@ git add -A && git commit -m "feat: add semi-ATB combat core with goblin enemy"
 ### Task 6: 세이브/로드 시스템
 
 **Files:**
-- Create: `openRPG/src/core/save.ts`
-- Test: `openRPG/tests/core/save.test.ts`
+- Create: `openRPG-web/src/core/save.ts`
+- Test: `openRPG-web/tests/core/save.test.ts`
 
 **Interfaces:**
 - Consumes: Task 3 `GameState`, Task 4 progression.
@@ -482,11 +482,11 @@ git add -A && git commit -m "feat: add IndexedDB save/load system"
 ### Task 7: Three.js 씬 + 플레이어 이동
 
 **Files:**
-- Create: `openRPG/src/engine/scene.ts`
-- Create: `openRPG/src/engine/playerController.ts`
-- Create: `openRPG/src/input/input.ts`
-- Modify: `openRPG/src/app.ts`, `openRPG/src/main.ts`
-- Test: `openRPG/tests/engine/playerController.test.ts` (논리 부분만)
+- Create: `openRPG-web/src/engine/scene.ts`
+- Create: `openRPG-web/src/engine/playerController.ts`
+- Create: `openRPG-web/src/input/input.ts`
+- Modify: `openRPG-web/src/app.ts`, `openRPG-web/src/main.ts`
+- Test: `openRPG-web/tests/engine/playerController.test.ts` (논리 부분만)
 
 **Interfaces:**
 - Consumes: Task 3 `GameState` (`position`), Task 2 데이터.
@@ -543,9 +543,9 @@ git add -A && git commit -m "feat: add three.js scene and player movement"
 ### Task 8: 전투 엔진 연결 (필드 전투)
 
 **Files:**
-- Create: `openRPG/src/engine/combatBridge.ts`
-- Modify: `openRPG/src/app.ts`
-- Test: `openRPG/tests/engine/combatBridge.test.ts`
+- Create: `openRPG-web/src/engine/combatBridge.ts`
+- Modify: `openRPG-web/src/app.ts`
+- Test: `openRPG-web/tests/engine/combatBridge.test.ts`
 
 **Interfaces:**
 - Consumes: Task 5 `GameState` combat 액션, Task 7 `SceneManager`.
@@ -602,11 +602,11 @@ git add -A && git commit -m "feat: connect combat system to three.js scene"
 ### Task 9: DOM 기반 HUD + 종족/클래스 선택 UI
 
 **Files:**
-- Create: `openRPG/src/ui/hud.ts`
-- Create: `openRPG/src/ui/characterCreate.ts`
-- Create: `openRPG/src/ui/styles.css`
-- Modify: `openRPG/src/app.ts`, `openRPG/index.html`
-- Test: `openRPG/tests/ui/hud.test.ts`
+- Create: `openRPG-web/src/ui/hud.ts`
+- Create: `openRPG-web/src/ui/characterCreate.ts`
+- Create: `openRPG-web/src/ui/styles.css`
+- Modify: `openRPG-web/src/app.ts`, `openRPG-web/index.html`
+- Test: `openRPG-web/tests/ui/hud.test.ts`
 
 **Interfaces:**
 - Consumes: Task 3 `GameState`, Task 2 `RACES`/`CLASSES`, Task 5 combat state.
@@ -669,9 +669,9 @@ git add -A && git commit -m "feat: add DOM HUD and character creation UI"
 ### Task 10: 통합 검증 + README
 
 **Files:**
-- Create: `openRPG/README.md`
-- Modify: `openRPG/src/app.ts` (세이브/로드 버튼, 자동저장)
-- Test: `openRPG/tests/integration/coreLoop.test.ts`
+- Create: `openRPG-web/README.md`
+- Modify: `openRPG-web/src/app.ts` (세이브/로드 버튼, 자동저장)
+- Test: `openRPG-web/tests/integration/coreLoop.test.ts`
 
 **Interfaces:**
 - Consumes: 모든 이전 태스크.
