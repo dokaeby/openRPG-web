@@ -1,0 +1,968 @@
+/*
+ * openRPG-web UI 스타일
+ * 디자인 토큰: docs/03_UI_UX_설계.md §색상 팔레트
+ * 양피지/잉크 + 놋쇠 장식의 다크 판타지 미학.
+ *
+ * 반응형/크로스브라우저 규칙:
+ * - 모든 컴포넌트 크기는 rem 기준 (루트 16px = 1rem, uiScale은
+ *   document.documentElement.style.fontSize로 조정).
+ * - px는 2px 이하 border와 미세 장식에만 사용.
+ * - Chrome/Edge/Safari 동일 렌더링을 위해 color-mix/oklch/lab 계열 함수와
+ *   :has 의사클래스를 사용하지 않고, 명시적 hex 색상, 표준 flex/grid만 사용.
+ * - 100vh 선언 뒤에 100dvh를 덮어쓰는 순서로 dvh 지원 브라우저 대응.
+ */
+
+/* ---------- 전역 리셋 / 기본값 ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family:
+    "Pretendard",
+    "Noto Sans KR",
+    "Malgun Gothic",
+    "Apple SD Gothic Neo",
+    sans-serif;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#ui {
+  overscroll-behavior: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+:root {
+  /* 색상 토큰 (docs/03 §2) */
+  --parchment: #F2E8D5;
+  --parchment-dark: #E4D6BC;
+  --ink: #2B2620;
+  --ink-soft: #5C5347;
+  --forest: #2F4A3C;
+  --oxblood: #7A2E2E;
+  --brass: #B08D3E;
+  --night: #1B1B22;
+  --arcane: #4A3A6B;
+
+  /* 파생 토큰 */
+  --parchment-edge: #C9B894;
+  --bar-track: rgba(27, 27, 34, 0.55);
+  --bar-hp-fill: var(--forest);
+  --bar-mp-fill: var(--arcane);
+  --bar-exp-fill: var(--brass);
+
+  /* 폰트 스택 (웹폰트 없이도 동일 렌더링되도록 제네릭 폴백 포함) */
+  --font-display:
+    "Noto Serif KR",
+    "Nanum Myeongjo",
+    "Malgun Gothic",
+    serif;
+  --font-body:
+    "Pretendard",
+    "Noto Sans KR",
+    "Malgun Gothic",
+    "Apple SD Gothic Neo",
+    sans-serif;
+
+  /* 레이아웃 토큰 */
+  --hud-edge: 0.75rem;
+  --panel-border: 1px;
+}
+
+/* ---------- HUD 루트 ---------- */
+
+.hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  inset: 0;
+  pointer-events: none;
+  font-family: var(--font-display);
+  color: var(--ink);
+  z-index: 10;
+}
+
+.hud-panel {
+  background: linear-gradient(
+    160deg,
+    rgba(242, 232, 213, 0.92),
+    rgba(228, 214, 188, 0.92)
+  );
+  border: var(--panel-border) solid var(--brass);
+  border-radius: 0.25rem;
+  box-shadow:
+    0 0 0 1px rgba(43, 38, 32, 0.35),
+    0 0.25rem 0.75rem rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- 상단 플레이어 정보 ---------- */
+
+.hud-top {
+  position: absolute;
+  top: var(--hud-edge);
+  left: var(--hud-edge);
+  width: 16.25rem;
+  max-width: calc(100vw - 2 * var(--hud-edge));
+  padding: 0.625rem 0.75rem;
+}
+
+.hud-name {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.375rem;
+  color: var(--ink);
+}
+
+.hud-name .hud-level {
+  color: var(--forest);
+  font-size: 0.8125rem;
+  margin-left: 0.375rem;
+}
+
+.hud-stats-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  margin-bottom: 0.375rem;
+}
+
+.hud-stats-line .hud-gold {
+  color: var(--brass);
+  font-weight: 700;
+}
+
+.hud-zone {
+  font-size: 0.6875rem;
+  color: var(--ink-soft);
+  margin-top: 0.25rem;
+}
+
+/* ---------- 게이지 바 ---------- */
+
+.bar {
+  position: relative;
+  height: 0.875rem;
+  background: var(--bar-track);
+  border: 1px solid rgba(43, 38, 32, 0.6);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 0.3125rem;
+}
+
+.bar-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: auto;
+  inset: 0 auto 0 0;
+  width: 100%;
+  transition: width 0.25s ease-out;
+}
+
+.bar-hp .bar-fill {
+  background: linear-gradient(180deg, #3d6353, var(--bar-hp-fill));
+}
+
+.bar-mp .bar-fill {
+  background: linear-gradient(180deg, #5d4f85, var(--bar-mp-fill));
+}
+
+.bar-exp {
+  height: 0.375rem;
+  margin-top: 0.125rem;
+}
+
+.bar-exp .bar-fill {
+  background: var(--bar-exp-fill);
+}
+
+.bar-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.625rem;
+  line-height: 1;
+  color: var(--parchment);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.03125rem;
+}
+
+/* ---------- 스킬 슬롯 / 퀘스트 ---------- */
+
+.hud-skills {
+  position: absolute;
+  left: var(--hud-edge);
+  bottom: var(--hud-edge);
+  display: flex;
+  gap: 0.5rem;
+}
+
+.skill-slot {
+  flex: 0 0 auto;
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(27, 27, 34, 0.85);
+  border: 1px solid var(--brass);
+  border-radius: 0.25rem;
+  color: var(--parchment);
+  font-size: 0.6875rem;
+  text-align: center;
+  padding: 0.125rem;
+  box-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.4);
+}
+
+.hud-quests {
+  position: absolute;
+  top: var(--hud-edge);
+  right: var(--hud-edge);
+  width: 15rem;
+  max-width: calc(100vw - 2 * var(--hud-edge));
+  max-height: 50vh;
+  max-height: 50dvh;
+  overflow-y: auto;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.75rem;
+}
+
+/* 수동 축소 유틸리티: .hud-collapsed 를 hud 루트에 붙이면 퀘스트 패널 숨김 */
+.hud-collapsed .hud-quests {
+  display: none;
+}
+
+.hud-quests h3 {
+  font-size: 0.75rem;
+  color: var(--forest);
+  border-bottom: 1px solid var(--parchment-edge);
+  padding-bottom: 0.25rem;
+  margin: 0 0 0.375rem;
+  letter-spacing: 0.0625rem;
+}
+
+.hud-quests .quest-empty {
+  color: var(--ink-soft);
+  font-size: 0.6875rem;
+}
+
+.hud-quests .quest-item {
+  padding: 0.1875rem 0;
+  color: var(--ink);
+  border-bottom: 1px dashed rgba(92, 83, 71, 0.3);
+}
+
+.hud-quests .quest-item:last-child {
+  border-bottom: none;
+}
+
+.hud-quests .quest-state {
+  color: var(--ink-soft);
+  font-size: 0.625rem;
+  margin-left: 0.25rem;
+}
+
+/* 퀘스트 토글 버튼: 모바일에서만 표시 */
+.hud-quests-toggle {
+  display: none;
+}
+
+/* ---------- 전투 패널 ---------- */
+
+.hud-combat {
+  position: absolute;
+  left: 50%;
+  bottom: var(--hud-edge);
+  transform: translateX(-50%);
+  width: min(35rem, 90vw);
+  max-width: calc(100vw - 2 * var(--hud-edge));
+  padding: 0.625rem 0.875rem;
+  background: linear-gradient(
+    160deg,
+    rgba(27, 27, 34, 0.92),
+    rgba(43, 38, 32, 0.92)
+  );
+  border: 1px solid var(--brass);
+  border-radius: 0.25rem;
+  color: var(--parchment);
+  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.5);
+}
+
+.combat-title {
+  font-size: 0.75rem;
+  letter-spacing: 0.125rem;
+  color: var(--brass);
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.combat-enemy {
+  display: grid;
+  grid-template-columns: 1fr 4.375rem 2.5rem;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  font-size: 0.8125rem;
+}
+
+.combat-enemy .enemy-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.combat-enemy .enemy-hp {
+  font-size: 0.625rem;
+  text-align: center;
+  color: var(--parchment);
+}
+
+.enemy-atb {
+  height: 0.375rem;
+  background: rgba(242, 232, 213, 0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.enemy-atb-fill {
+  height: 100%;
+  background: var(--brass);
+  transition: width 0.2s linear;
+}
+
+.combat-player-row {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(176, 141, 62, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+}
+
+.combat-player-row .player-atb-hint {
+  color: var(--ink-soft);
+}
+
+.combat-player-row .player-atb-hint.atb-ready {
+  color: var(--brass);
+  font-weight: 700;
+  animation: atb-pulse 1s ease-in-out infinite;
+}
+
+@keyframes atb-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* ---------- 토스트 ---------- */
+
+.hud-toasts {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.375rem;
+  pointer-events: none;
+  max-width: calc(100vw - 2 * var(--hud-edge));
+}
+
+.toast {
+  padding: 0.5rem 1.125rem;
+  background: rgba(27, 27, 34, 0.9);
+  border: 1px solid var(--brass);
+  border-radius: 3px;
+  color: var(--parchment);
+  font-size: 0.8125rem;
+  box-shadow: 0 0.1875rem 0.625rem rgba(0, 0, 0, 0.45);
+  animation: toast-in 0.2s ease-out;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- 캐릭터 생성 화면 ---------- */
+
+.character-create {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(27, 27, 34, 0.82);
+  z-index: 20;
+  pointer-events: auto;
+  font-family: var(--font-display);
+  color: var(--ink);
+}
+
+.character-create[hidden] {
+  display: none;
+}
+
+.cc-panel {
+  width: min(45rem, 92vw);
+  max-width: calc(100vw - 1rem);
+  max-height: 90vh;
+  max-height: 90dvh;
+  overflow-y: auto;
+  padding: 1.5rem 1.75rem;
+  background: linear-gradient(
+    160deg,
+    var(--parchment),
+    var(--parchment-dark)
+  );
+  border: 2px solid var(--brass);
+  border-radius: 6px;
+  box-shadow:
+    0 0 0 1px rgba(43, 38, 32, 0.4),
+    0 0.5rem 1.875rem rgba(0, 0, 0, 0.6);
+}
+
+.cc-title {
+  text-align: center;
+  font-size: 1.375rem;
+  letter-spacing: 0.25rem;
+  color: var(--forest);
+  margin: 0 0 0.25rem;
+}
+
+.cc-subtitle {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  margin-bottom: 1.125rem;
+}
+
+.cc-section-title {
+  font-size: 0.875rem;
+  color: var(--forest);
+  border-bottom: 1px solid var(--parchment-edge);
+  padding-bottom: 0.25rem;
+  margin: 1rem 0 0.625rem;
+  letter-spacing: 0.0625rem;
+}
+
+.cc-name-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.cc-name-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: var(--ink);
+  background: var(--parchment-dark);
+  border: 1px solid var(--parchment-edge);
+  border-radius: 3px;
+  outline: none;
+}
+
+.cc-name-input:focus {
+  border-color: var(--forest);
+}
+
+.cc-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9.375rem, 1fr));
+  gap: 0.5rem;
+}
+
+.cc-card {
+  padding: 0.625rem;
+  background: rgba(255, 252, 244, 0.5);
+  border: 1px solid var(--parchment-edge);
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background 0.15s,
+    transform 0.1s;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cc-card:hover {
+  border-color: var(--brass);
+  transform: translateY(-1px);
+}
+
+.cc-card.selected {
+  border-color: var(--brass);
+  background: rgba(176, 141, 62, 0.15);
+  box-shadow: inset 0 0 0 1px var(--brass);
+}
+
+.cc-card .card-name {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--forest);
+  margin-bottom: 0.25rem;
+}
+
+.cc-card .card-desc {
+  font-size: 0.6875rem;
+  color: var(--ink-soft);
+  line-height: 1.4;
+  margin-bottom: 0.375rem;
+}
+
+.cc-card .card-passive {
+  font-size: 0.625rem;
+  color: var(--brass);
+  border-top: 1px dashed var(--parchment-edge);
+  padding-top: 0.3125rem;
+  line-height: 1.35;
+}
+
+.cc-card .card-passive .passive-name {
+  font-weight: 700;
+}
+
+.cc-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.25rem;
+}
+
+.cc-create-btn {
+  padding: 0.625rem 2.5rem;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  letter-spacing: 0.1875rem;
+  color: var(--parchment);
+  background: linear-gradient(180deg, #3a5a4a, var(--forest));
+  border: 1px solid var(--brass);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: filter 0.15s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cc-create-btn:hover:not(:disabled) {
+  filter: brightness(1.15);
+}
+
+.cc-create-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ---------- 저장/불러오기 바 ---------- */
+
+.save-bar {
+  position: absolute;
+  top: var(--hud-edge);
+  right: var(--hud-edge);
+  display: flex;
+  gap: 0.375rem;
+  pointer-events: auto;
+  z-index: 10;
+}
+
+.save-bar button {
+  padding: 0.375rem 0.875rem;
+  font-size: 0.8125rem;
+  font-family: var(--font-display);
+  color: var(--parchment);
+  background: rgba(47, 74, 60, 0.9);
+  border: 1px solid var(--brass);
+  border-radius: 3px;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.save-bar button:hover {
+  filter: brightness(1.2);
+}
+
+/* ============================================================
+ * 반응형 브레이크포인트
+ * ≥1280px: 기본(데스크톱) 레이아웃
+ * 1024–1279px: 소형 데스크톱 압축
+ * 768–1023px: 태블릿
+ * ≤767px: 모바일
+ * ============================================================ */
+
+/* ---------- 1024–1279px: 소형 데스크톱 압축 ---------- */
+
+@media (max-width: 1279px) {
+  .hud-top {
+    width: 15rem;
+    padding: 0.5rem 0.625rem;
+  }
+
+  .hud-quests {
+    width: 13.75rem;
+  }
+
+  .hud-combat {
+    width: min(30rem, 92vw);
+  }
+
+  .cc-panel {
+    padding: 1.25rem 1.5rem;
+  }
+}
+
+/* ---------- 768–1023px: 태블릿 ---------- */
+
+@media (max-width: 1023px) {
+  :root {
+    --hud-edge: 0.625rem;
+  }
+
+  .hud-top {
+    width: 13.75rem;
+    padding: 0.5rem 0.625rem;
+  }
+
+  .hud-name {
+    font-size: 0.9375rem;
+  }
+
+  .hud-quests {
+    width: 12.5rem;
+    max-height: 35vh;
+    max-height: 35dvh;
+    font-size: 0.6875rem;
+  }
+
+  .hud-skills {
+    gap: 0.375rem;
+  }
+
+  .skill-slot {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .hud-combat {
+    width: min(26rem, 94vw);
+    padding: 0.5rem 0.75rem;
+  }
+
+  .save-bar button {
+    padding: 0.3125rem 0.625rem;
+    font-size: 0.75rem;
+  }
+
+  .cc-panel {
+    width: min(40rem, 94vw);
+    padding: 1.25rem 1.25rem;
+  }
+
+  .cc-cards {
+    grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  }
+}
+
+/* ---------- ≤767px: 모바일 ---------- */
+
+@media (max-width: 767px) {
+  :root {
+    --hud-edge: 0.5rem;
+  }
+
+  /* 상단 바: HP/MP/레벨 중심으로 압축 */
+  .hud-top {
+    width: auto;
+    min-width: 9rem;
+    max-width: calc(100vw - 5rem);
+    padding: 0.5rem 0.625rem;
+  }
+
+  .hud-name {
+    font-size: 0.9375rem;
+    margin-bottom: 0.25rem;
+  }
+
+  /* 골드/EXP 요약 라인 숨김 (필수 정보만 표시) */
+  .hud-stats-line,
+  .hud-zone {
+    display: none;
+  }
+
+  .bar {
+    height: 0.8125rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .bar-exp {
+    height: 0.3125rem;
+  }
+
+  /* 스킬: 하단 가로 스크롤 스트립 */
+  .hud-skills {
+    left: var(--hud-edge);
+    right: var(--hud-edge);
+    bottom: var(--hud-edge);
+    max-width: none;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0.125rem;
+  }
+
+  .hud-skills::-webkit-scrollbar {
+    display: none;
+  }
+
+  .skill-slot {
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 0.625rem;
+  }
+
+  /* 퀘스트: 기본 숨김, 토글 버튼으로 하단 시트 표시 */
+  .hud-quests {
+    display: none;
+    top: auto;
+    right: var(--hud-edge);
+    left: var(--hud-edge);
+    bottom: 4.5rem;
+    width: auto;
+    max-width: none;
+    max-height: 40vh;
+    max-height: 40dvh;
+    overflow-y: auto;
+    z-index: 11;
+  }
+
+  .hud-quests-open .hud-quests {
+    display: block;
+  }
+
+  .hud-quests-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: var(--hud-edge);
+    right: var(--hud-edge);
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0.25rem 0.625rem;
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    color: var(--parchment);
+    background: rgba(47, 74, 60, 0.9);
+    border: 1px solid var(--brass);
+    border-radius: 3px;
+    cursor: pointer;
+    pointer-events: auto;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* 전투 패널: 하단 시트 스타일 */
+  .hud-combat {
+    left: var(--hud-edge);
+    right: var(--hud-edge);
+    bottom: var(--hud-edge);
+    transform: none;
+    width: auto;
+    max-width: none;
+    max-height: 55vh;
+    max-height: 55dvh;
+    overflow-y: auto;
+  }
+
+  .combat-enemy {
+    grid-template-columns: 1fr 3.5rem 2rem;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+  }
+
+  /* 토스트: 상단 중앙으로 이동 (하단 전투/스킬과 겹침 방지) */
+  .hud-toasts {
+    top: 3.5rem;
+    bottom: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .toast {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.875rem;
+  }
+
+  /* 저장 바: 스킬 스트립 위쪽 우측으로 이동, 더 작게 */
+  .save-bar {
+    top: auto;
+    bottom: 4rem;
+    right: var(--hud-edge);
+  }
+
+  .save-bar button {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.6875rem;
+  }
+
+  /* 캐릭터 생성: 단일 컬럼 스크롤 */
+  .cc-panel {
+    width: calc(100vw - 1rem);
+    max-width: none;
+    max-height: 92vh;
+    max-height: 92dvh;
+    padding: 1rem 1rem;
+    border-width: 1px;
+    border-radius: 4px;
+  }
+
+  .cc-title {
+    font-size: 1.125rem;
+    letter-spacing: 0.125rem;
+  }
+
+  .cc-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .cc-create-btn {
+    width: 100%;
+    padding: 0.75rem 1rem;
+  }
+}
+
+/* ---------- 360px급 초소형 화면 추가 압축 ---------- */
+
+@media (max-width: 380px) {
+  .hud-top {
+    min-width: 7.5rem;
+    max-width: calc(100vw - 4.25rem);
+    padding: 0.375rem 0.5rem;
+  }
+
+  .hud-name {
+    font-size: 0.8125rem;
+  }
+
+  .hud-level,
+  .hud-name .hud-level {
+    font-size: 0.6875rem;
+  }
+
+  .hud-quests-toggle {
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    font-size: 0.6875rem;
+    padding: 0.25rem 0.375rem;
+  }
+
+  .save-bar button {
+    padding: 0.1875rem 0.375rem;
+    font-size: 0.625rem;
+  }
+
+  .cc-panel {
+    padding: 0.75rem 0.75rem;
+  }
+}
+
+/* ============================================================
+ * 포인터/모션 접근성
+ * ============================================================ */
+
+/* 터치 기기: 최소 터치 타겟 44px (2.75rem) */
+@media (pointer: coarse) {
+  .cc-create-btn,
+  .save-bar button,
+  .hud-quests-toggle {
+    min-height: 2.75rem;
+  }
+
+  .cc-card {
+    min-height: 2.75rem;
+  }
+
+  .cc-name-input {
+    min-height: 2.75rem;
+  }
+}
+
+/* 모션 감소 설정: 모든 애니메이션/전환 비활성화 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- 상호작용 힌트 ---------- */
+
+.interact-hint {
+  position: absolute;
+  bottom: 22%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.5rem 1rem;
+  background: rgba(27, 27, 34, 0.88);
+  border: 1px solid var(--brass);
+  border-radius: 3px;
+  color: var(--parchment);
+  font-size: 0.9rem;
+  pointer-events: none;
+  z-index: 15;
+  white-space: nowrap;
+}
+
+.interact-hint[hidden] {
+  display: none;
+}

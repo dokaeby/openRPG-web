@@ -1,5 +1,14 @@
 import type { BaseStats, ClassDef, ClassId } from "../core/types";
 
+/**
+ * ClassDef + 보유 스킬 ID 목록.
+ * ClassDef 본체는 core/types.ts에 있으며, 스킬 목록은 클래스별 데이터이므로
+ * 여기서 확장한다 (코어 타입 수정 없이 data 계층에서 관리).
+ */
+export interface ClassDefWithSkills extends ClassDef {
+  skills: string[];
+}
+
 const baseStats = (partial: Partial<BaseStats>): BaseStats => ({
   hp: 100,
   mp: 50,
@@ -11,7 +20,7 @@ const baseStats = (partial: Partial<BaseStats>): BaseStats => ({
   ...partial,
 });
 
-export const CLASSES: Record<ClassId, ClassDef> = {
+export const CLASSES: Record<ClassId, ClassDefWithSkills> = {
   warrior: {
     id: "warrior",
     name: "전사",
@@ -19,6 +28,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     baseStats: baseStats({ hp: 150, mp: 30, str: 10, vit: 8 }),
     growthPerLevel: { hp: 12, mp: 2, str: 2, vit: 1 },
     weaponTypes: ["sword", "axe", "shield"],
+    skills: ["power_slash", "guard_stance"],
   },
   mage: {
     id: "mage",
@@ -27,6 +37,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     baseStats: baseStats({ hp: 80, mp: 100, int: 10, vit: 4 }),
     growthPerLevel: { hp: 6, mp: 10, int: 2 },
     weaponTypes: ["staff", "wand"],
+    skills: ["fireball", "ice_lance"],
   },
   archer: {
     id: "archer",
@@ -35,6 +46,7 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     baseStats: baseStats({ hp: 100, mp: 50, dex: 10, str: 6 }),
     growthPerLevel: { hp: 8, mp: 4, dex: 2, luk: 1 },
     weaponTypes: ["bow"],
+    skills: ["double_shot", "aimed_shot"],
   },
   rogue: {
     id: "rogue",
@@ -43,5 +55,6 @@ export const CLASSES: Record<ClassId, ClassDef> = {
     baseStats: baseStats({ hp: 90, mp: 60, dex: 10, luk: 8 }),
     growthPerLevel: { hp: 7, mp: 5, dex: 2, luk: 1 },
     weaponTypes: ["dagger", "bow"],
+    skills: ["backstab", "poison_blade"],
   },
 };

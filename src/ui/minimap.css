@@ -1,0 +1,58 @@
+.minimap {
+  /* UI 팔레트 (docs/03 §2) */
+  --minimap-parchment: #f2e8d5;
+  --minimap-ink: #2b2620;
+  --minimap-forest: #2f4a3c;
+  --minimap-oxblood: #7a2e2e;
+  --minimap-brass: #b08d3e;
+  --minimap-night: #1b1b22;
+  --minimap-arcane: #4a3a6b;
+
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 4px solid var(--minimap-brass);
+  background: var(--minimap-night);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.minimap.hidden {
+  display: none;
+}
+
+.minimap-field {
+  position: absolute;
+  inset: 0;
+}
+
+.minimap-marker {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--minimap-oxblood);
+  transform: translate(-50%, -50%);
+}
+
+.minimap-marker.player {
+  width: 10px;
+  height: 10px;
+  background: var(--minimap-forest);
+  border: 2px solid var(--minimap-parchment);
+  box-sizing: border-box;
+}
+
+.minimap-zone-name {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 8px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--minimap-parchment);
+  text-shadow: 0 1px 2px var(--minimap-ink);
+}

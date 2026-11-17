@@ -1,9 +1,11 @@
-import type { ClassDef, RaceDef } from "../core/types";
+import type { RaceDef } from "../core/types";
 import { RACES } from "./races";
 import { CLASSES } from "./classes";
+import type { ClassDefWithSkills } from "./classes";
 
 export { RACES } from "./races";
 export { CLASSES } from "./classes";
+export type { ClassDefWithSkills } from "./classes";
 export type {
   BaseStats,
   ClassDef,
@@ -20,8 +22,8 @@ export function getRace(id: string): RaceDef {
   return race;
 }
 
-export function getClass(id: string): ClassDef {
-  const cls = (CLASSES as Record<string, ClassDef>)[id];
+export function getClass(id: string): ClassDefWithSkills {
+  const cls = (CLASSES as Record<string, ClassDefWithSkills>)[id];
   if (!cls) {
     throw new Error(`Unknown class id: ${id}`);
   }

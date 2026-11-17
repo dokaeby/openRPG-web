@@ -1,8 +1,39 @@
 import * as THREE from "three";
+import { getZone } from "../data/zones";
+import type { ZoneDef } from "../data/zones";
 
-const GROUND_SIZE = 200;
 const CAMERA_OFFSET = new THREE.Vector3(0, 12, 14);
 const CAMERA_LERP = 4;
+
+function hashString(s: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+/**
+ * Deterministic pseudo-random point inside the zone square using an LCG
+ * seeded by the zone id, so a given zone always renders the same layout.
+ */
+function seededPoint(
+  zoneId: string,
+  index: number,
+  size: number,
+): [number, number] {
+  let state = hashString(zoneId) ^ Math.imul(index + 1, 0x9e3779b1);
+  const next = () => {
+    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+    return state / 0xffffffff;
+  };
+  const margin = size * 0.15;
+  const span = size - margin * 2;
+  const x = margin + next() * span;
+  const z = margin + next() * span;
+  return [x - size / 2, z - size / 2];
+}
 
 /**
  * Owns the Three.js renderer, scene, camera, lights, and zone content.
@@ -18,6 +49,8 @@ export class SceneManager {
   private readonly scene = new THREE.Scene();
   private readonly zoneRoot = new THREE.Group();
   private readonly camGoal = new THREE.Vector3();
+
+  private zone: ZoneDef;
 
   constructor(canvas: HTMLCanvasElement) {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -44,41 +77,66 @@ export class SceneManager {
     sun.shadow.mapSize.set(2048, 2048);
     this.scene.add(sun);
 
+    this.zone = getZone("greenfield");
     this.scene.add(this.zoneRoot);
     this.buildZone();
   }
 
   async setZone(zoneId: string): Promise<void> {
-    // Prototype: only "greenfield" has bespoke content; all other zone
-    // ids reuse the same ground layout.
-    void zoneId;
+    try {
+      this.zone = getZone(zoneId);
+    } catch {
+      this.zone = getZone("greenfield");
+    }
     this.buildZone();
   }
 
+  addToZone(obj: THREE.Object3D): void {
+    this.zoneRoot.add(obj);
+  }
+
+  removeFromZone(obj: THREE.Object3D): void {
+    this.zoneRoot.remove(obj);
+  }
+
   private buildZone(): void {
+    const zone = this.zone;
     this.zoneRoot.clear();
 
+    this.scene.background = new THREE.Color(zone.fogColor);
+    this.scene.fog = new THREE.Fog(zone.fogColor, zone.fogNear, zone.fogFar);
+
     const ground = new THREE.Mesh(
-      new THREE.PlaneGeometry(GROUND_SIZE, GROUND_SIZE),
-      new THREE.MeshLambertMaterial({ color: 0x4a9e4a }),
+      new THREE.PlaneGeometry(zone.size, zone.size),
+      new THREE.MeshLambertMaterial({ color: zone.groundColor }),
     );
     ground.rotation.x = -Math.PI / 2;
     ground.receiveShadow = true;
     this.zoneRoot.add(ground);
 
-    // Placeholder obstacles.
+    // Placeholder obstacles, deterministically laid out per zone.
     const obstacleMat = new THREE.MeshLambertMaterial({ color: 0x8b6f47 });
-    const positions: [number, number, number][] = [
-      [6, 0.75, -4],
-      [-7, 0.75, 3],
-      [2, 0.75, 9],
-      [-3, 0.75, -10],
-    ];
-    for (const [x, y, z] of positions) {
-      const box = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1.5, 1.5), obstacleMat);
-      box.position.set(x, y, z);
+    for (let i = 0; i < 8; i++) {
+      const box = new THREE.Mesh(
+        new THREE.BoxGeometry(1.5, 1.5, 1.5),
+        obstacleMat,
+      );
+      const [x, z] = seededPoint(zone.id, i, zone.size);
+      box.position.set(x, 0.75, z);
       box.castShadow = true;
       this.zoneRoot.add(box);
+    }
+
+    // Portals.
+    const portalMat = new THREE.MeshBasicMaterial({ color: 0x4a3a6b });
+    for (const portal of zone.portals) {
+      const mesh = new THREE.Mesh(
+        new THREE.CylinderGeometry(1, 1, 0.2, 16),
+        portalMat,
+      );
+      mesh.position.set(portal.x, 0.1, portal.z);
+      mesh.userData.portal = portal;
+      this.zoneRoot.add(mesh);
     }
   }
 
