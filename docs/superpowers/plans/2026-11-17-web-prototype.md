@@ -1,6 +1,6 @@
 # Web RPG Prototype (Phase 0) Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Vite+TypeScript+Three.js 프로젝트를 스캐폴드하고, 종족/클래스 선택 → 필드 이동 → 세미리얼 ATB 전투 → 레벨업 → 세이브까지의 코어 루프를 동작하는 프로토타입으로 만든다.
 
@@ -40,7 +40,7 @@
 **Interfaces:**
 - Produces: `pnpm dev`로 Vite 개발 서버 실행, `pnpm test`로 Vitest 실행, `pnpm build`로 빌드.
 
-- [ ] **Step 1: pnpm 프로젝트 초기화**
+- [x] **Step 1: pnpm 프로젝트 초기화**
 
 ```bash
 cd openRPG
@@ -49,7 +49,7 @@ pnpm add three zod idb-keyval
 pnpm add -D typescript vite vitest @vitejs/plugin-react eslint typescript-eslint
 ```
 
-- [ ] **Step 2: 설정 파일 작성**
+- [x] **Step 2: 설정 파일 작성**
 
 `tsconfig.json`: `strict: true`, `target: ES2022`, `module: ESNext`, `moduleResolution: bundler`, `types: ["vite/client"]`.
 `vite.config.ts`: `plugins: []` (React 불필요, DOM UI는 vanilla TS로 작성), `test`는 vitest.config.ts로 분리.
@@ -58,7 +58,7 @@ pnpm add -D typescript vite vitest @vitejs/plugin-react eslint typescript-eslint
 `eslint.config.js`: `src/core/**`, `src/data/**`에 `no-restricted-imports`로 `three`, `three/*`, `idb-keyval` 금지.
 `.gitignore`: `node_modules`, `dist`, `*.local`.
 
-- [ ] **Step 3: package.json 스크립트**
+- [x] **Step 3: package.json 스크립트**
 
 ```json
 "scripts": {
@@ -69,12 +69,12 @@ pnpm add -D typescript vite vitest @vitejs/plugin-react eslint typescript-eslint
 }
 ```
 
-- [ ] **Step 4: 검증**
+- [x] **Step 4: 검증**
 
 Run: `pnpm build && pnpm test`
 Expected: 빌드 성공, 테스트 0개로 통과.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add -A && git commit -m "chore: scaffold vite+typescript+three.js project"
@@ -100,7 +100,7 @@ git add -A && git commit -m "chore: scaffold vite+typescript+three.js project"
   - `function getRace(id: string): RaceDef` — 없는 ID면 `Error` throw
   - `function getClass(id: string): ClassDef` — 없는 ID면 `Error` throw
 
-- [ ] **Step 1: 실패 테스트 작성**
+- [x] **Step 1: 실패 테스트 작성**
 
 ```ts
 import { describe, it, expect } from "vitest";
@@ -127,21 +127,21 @@ describe("data lookup", () => {
 });
 ```
 
-- [ ] **Step 2: 테스트 실패 확인**
+- [x] **Step 2: 테스트 실패 확인**
 
 Run: `pnpm test tests/core/types.test.ts`
 Expected: FAIL (모듈 없음)
 
-- [ ] **Step 3: 구현**
+- [x] **Step 3: 구현**
 
 `src/core/types.ts`에 위 인터페이스 정의. `src/data/races.ts`에 6종족(인간/엘프/드워프/오크/골렘/반혈) 정의 — 01번 문서 §3.2의 능력치 보정/고유 스킬을 반영. `src/data/classes.ts`에 4클래스(전사/마법사/궁수/도적) 정의 — 기본 스탯과 레벨당 성장치. `getRace`/`getClass`는 `Record` 조회 후 없으면 throw.
 
-- [ ] **Step 4: 테스트 통과 확인**
+- [x] **Step 4: 테스트 통과 확인**
 
 Run: `pnpm test tests/core/types.test.ts`
 Expected: PASS 5개
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add -A && git commit -m "feat: add race/class data types and schemas"
@@ -168,7 +168,7 @@ git add -A && git commit -m "feat: add race/class data types and schemas"
   - `class GameState { data: GameStateData; dispatch(action: GameAction): void; getState(): GameStateData }`
   - `type GameAction = { type: "createCharacter"; name: string; race: RaceId; classId: ClassId } | { type: "setPosition"; x: number; y: number; z: number } | { type: "setQuestState"; questId: string; state: QuestState } | { type: "setSetting"; key: keyof GameStateData["settings"]; value: number | boolean }`
 
-- [ ] **Step 1: 실패 테스트 작성**
+- [x] **Step 1: 실패 테스트 작성**
 
 ```ts
 // eventBus.test.ts
@@ -207,21 +207,21 @@ it("updates quest state", () => {
 });
 ```
 
-- [ ] **Step 2: 테스트 실패 확인**
+- [x] **Step 2: 테스트 실패 확인**
 
 Run: `pnpm test tests/core/eventBus.test.ts tests/core/gameState.test.ts`
 Expected: FAIL
 
-- [ ] **Step 3: 구현**
+- [x] **Step 3: 구현**
 
 `EventBus`: Map 기반 구독 관리, `on`은 unsubscribe 함수 반환. `GameState`: `data`를 내부에 두고 `dispatch`로만 변경. `createCharacter`는 `getRace`/`getClass`로 스탯 계산 — `maxHp = classBase.hp + raceMod.vit*10`, `maxMp = classBase.mp + raceMod.int*5`, 나머지 스탯은 class base + race mod 합산. `position` 기본값 `{ zone: "greenfield", x: 0, y: 0, z: 0 }`. `skills`는 클래스 기본 스킬 1개. 잘못된 ID는 `getRace`/`getClass`의 throw를 그대로 전파.
 
-- [ ] **Step 4: 테스트 통과 확인**
+- [x] **Step 4: 테스트 통과 확인**
 
 Run: `pnpm test tests/core/`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add -A && git commit -m "feat: add event bus and game state core"
@@ -243,7 +243,7 @@ git add -A && git commit -m "feat: add event bus and game state core"
   - `function addExp(gs: GameState, amount: number): { levelsGained: number }` — GameState 내부에서 player.exp 누적, 레벨업 시 stats 성장치 적용, `"player:levelup"` 이벤트 emit
   - `GameAction`에 `{ type: "addExp"; amount: number }` 추가
 
-- [ ] **Step 1: 실패 테스트 작성**
+- [x] **Step 1: 실패 테스트 작성**
 
 ```ts
 it("expToNext follows curve", () => {
@@ -273,21 +273,21 @@ it("emits player:levelup event", () => {
 });
 ```
 
-- [ ] **Step 2: 테스트 실패 확인**
+- [x] **Step 2: 테스트 실패 확인**
 
 Run: `pnpm test tests/core/progression.test.ts`
 Expected: FAIL
 
-- [ ] **Step 3: 구현**
+- [x] **Step 3: 구현**
 
 `progression.ts`에 `expToNext`, `addExp` 구현. `addExp`는 player가 없으면 no-op, `level >= 50`이면 exp만 누적(레벨업 없음). 레벨업 시 `growthPerLevel`만큼 각 스탯 증가, `maxHp`/`maxMp`도 재계산, HP/MP는 레벨업분만큼 회복. `GameState`에 `bus: EventBus` 필드를 노출하고 `dispatch`의 `addExp` 케이스에서 `addExp(gs, amount)` 호출.
 
-- [ ] **Step 4: 테스트 통과 확인**
+- [x] **Step 4: 테스트 통과 확인**
 
 Run: `pnpm test tests/core/progression.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add -A && git commit -m "feat: add level/exp progression system"
@@ -317,7 +317,7 @@ git add -A && git commit -m "feat: add level/exp progression system"
   - `GameState.data.combat: CombatState | null` 추가
   - `GameAction`에 `{ type: "startCombat"; monsterIds: string[] }`, `{ type: "combatPlayerAttack"; targetId: string }`, `{ type: "combatEnemyTurn" }` 추가
 
-- [ ] **Step 1: 실패 테스트 작성**
+- [x] **Step 1: 실패 테스트 작성**
 
 ```ts
 it("starts combat with goblin", () => {
@@ -367,21 +367,21 @@ it("tickAtb fills gauge by speed", () => {
 });
 ```
 
-- [ ] **Step 2: 테스트 실패 확인**
+- [x] **Step 2: 테스트 실패 확인**
 
 Run: `pnpm test tests/core/combat.test.ts`
 Expected: FAIL
 
-- [ ] **Step 3: 구현**
+- [x] **Step 3: 구현**
 
 `combat.ts`: `startCombat`은 `MONSTERS`에서 적 스탯을 읽어 `Combatant` 생성 (플레이어 측은 `player`의 파생 스탯으로 `attack = str*2`, `defense = vit`, `speed = dex`). 데미지 공식: `max(1, round(attacker.attack - defender.defense * 0.5 + rand(-2, 2)))`. `crit`은 `luk` 기반 5% + 1%/luk. `tickAtb`는 `dtMs`를 받아 모든 combatant의 atb 증가, 100 도달 시 0으로 리셋하고 `ready` 플래그(간단히 atb=100 상태로 유지, 행동 후 `consumeAtb`). `playerAttack`은 플레이어가 `atb>=100`일 때만 허용, 아니면 throw. `enemyTurn`은 모든 적이 순차 공격(프로토타입 단순화: 가장 빠른 적 1마리). 전투 종료 시 `phase` 설정, `won`이면 `expReward`/`goldReward`를 player에 지급하고 `"combat:ended"` 이벤트 emit. `lost`이면 `"player:died"` emit.
 
-- [ ] **Step 4: 테스트 통과 확인**
+- [x] **Step 4: 테스트 통과 확인**
 
 Run: `pnpm test tests/core/combat.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add -A && git commit -m "feat: add semi-ATB combat core with goblin enemy"
@@ -406,7 +406,7 @@ git add -A && git commit -m "feat: add semi-ATB combat core with goblin enemy"
   - `async function deleteSave(slotId: string): Promise<void>`
   - `function serialize(gs: GameState): GameStateData` — 직렬화 가능한 순수 데이터 반환
 
-- [ ] **Step 1: 실패 테스트 작성**
+- [x] **Step 1: 실패 테스트 작성**
 
 ```ts
 import { describe, it, expect, beforeEach } from "vitest";
@@ -457,21 +457,21 @@ it("deletes save", async () => {
 });
 ```
 
-- [ ] **Step 2: 테스트 실패 확인**
+- [x] **Step 2: 테스트 실패 확인**
 
 Run: `pnpm test tests/core/save.test.ts`
 Expected: FAIL
 
-- [ ] **Step 3: 구현**
+- [x] **Step 3: 구현**
 
 `save.ts`: `idb-keyval`의 `get/set/del/keys` 사용. 키 네이밍: `save:${slotId}`. 저장 시 `{ saveVersion: SAVE_VERSION, savedAt: Date.now(), data: serialize(gs) }` 구조. `loadGame`은 `saveVersion !== SAVE_VERSION`이면 null 반환. `listSaves`는 `keys()`로 `save:` 프리픽스 필터 후 각 슬롯의 `savedAt`/`id` 반환. `serialize`는 `gs.getState()`를 구조적 복제로 반환.
 
-- [ ] **Step 4: 테스트 통과 확인**
+- [x] **Step 4: 테스트 통과 확인**
 
 Run: `pnpm test tests/core/save.test.ts`
 Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add -A && git commit -m "feat: add IndexedDB save/load system"
@@ -496,7 +496,7 @@ git add -A && git commit -m "feat: add IndexedDB save/load system"
   - `interface InputState { forward: boolean; back: boolean; left: boolean; right: boolean; run: boolean }`
   - `class InputManager { constructor(target: HTMLElement); state: InputState; attach(): void; detach(): void }`
 
-- [ ] **Step 1: 실패 테스트 작성 (이동 로직만)**
+- [x] **Step 1: 실패 테스트 작성 (이동 로직만)**
 
 ```ts
 import { PlayerController } from "../../src/engine/playerController";
@@ -512,12 +512,12 @@ it("moves forward when input.forward is true", () => {
 });
 ```
 
-- [ ] **Step 2: 테스트 실패 확인**
+- [x] **Step 2: 테스트 실패 확인**
 
 Run: `pnpm test tests/engine/playerController.test.ts`
 Expected: FAIL
 
-- [ ] **Step 3: 구현**
+- [x] **Step 3: 구현**
 
 `SceneManager`: Three.js `WebGLRenderer`, `Scene`, `PerspectiveCamera`(3인칭 추적 또는 탑다운 — 프로토타입은 **3인칭 추적**), 조명(HemisphereLight + DirectionalLight), 간단한 지면(PlaneGeometry + 초록색 재질)과 장애물 박스 몇 개. `setZone`은 존 ID로 씬 구성 분기(프로토타입은 "greenfield"만 실제 구현, 나머지는 같은 지면 재사용).
 
@@ -527,12 +527,12 @@ Expected: FAIL
 
 `app.ts`: `SceneManager` + `PlayerController` + `InputManager` 생성, `requestAnimationFrame` 루프에서 `input.state` 읽어 `playerController.update` → `GameState.dispatch({type:"setPosition",...})` → `sceneManager.update/render`.
 
-- [ ] **Step 4: 테스트 통과 확인 + 수동 확인**
+- [x] **Step 4: 테스트 통과 확인 + 수동 확인**
 
 Run: `pnpm test tests/engine/playerController.test.ts`
 Expected: PASS. `pnpm dev`로 브라우저에서 WASD 이동 확인.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add -A && git commit -m "feat: add three.js scene and player movement"
@@ -553,7 +553,7 @@ git add -A && git commit -m "feat: add three.js scene and player movement"
   - `class CombatBridge { constructor(gs: GameState, scene: SceneManager); startEncounter(monsterIds: string[]): void; update(dtMs: number): void; onPlayerAttack(): void; onEnemyPhase(): void; end(): void }`
   - 필드에서 적 메시 근처 접근 시 `startCombat` dispatch, 전투 중에는 `tickAtb(gs, dt)` 호출, UI에 상태 전달.
 
-- [ ] **Step 1: 실패 테스트 작성**
+- [x] **Step 1: 실패 테스트 작성**
 
 ```ts
 it("starts combat and ticks ATB", () => {
@@ -575,23 +575,23 @@ it("player attack triggers combatPlayerAttack action", () => {
 });
 ```
 
-- [ ] **Step 2: 테스트 실패 확인**
+- [x] **Step 2: 테스트 실패 확인**
 
 Run: `pnpm test tests/engine/combatBridge.test.ts`
 Expected: FAIL
 
-- [ ] **Step 3: 구현**
+- [x] **Step 3: 구현**
 
 `CombatBridge`: `startEncounter`는 `gs.dispatch({type:"startCombat"})` 호출 후 전투 UI 상태를 `"combat:started"` 이벤트로 emit. `update(dtMs)`는 `gs.getState().combat?.phase === "active"`일 때 `tickAtb(gs, dtMs)` 호출. `onPlayerAttack`는 플레이어 atb가 100 이상일 때 `gs.dispatch({type:"combatPlayerAttack", targetId})` 호출 후 atb 리셋. `onEnemyPhase`는 적 atb가 100 이상일 때 `gs.dispatch({type:"combatEnemyTurn"})`. `end()`는 `phase`가 `won`/`lost`일 때 호출되어 씬 복귀.
 
 필드 전투 트리거: `app.ts`의 루프에서 플레이어 위치와 적 메시 거리 체크, 일정 거리 이내 + 이동 키 입력 시 `startEncounter`. 프로토타입은 맵에 고블린 1마리를 배치하고 근접 시 자동 전투 진입.
 
-- [ ] **Step 4: 테스트 통과 확인 + 수동 확인**
+- [x] **Step 4: 테스트 통과 확인 + 수동 확인**
 
 Run: `pnpm test tests/engine/combatBridge.test.ts`
 Expected: PASS. `pnpm dev`에서 고블린 접근 → 전투 진입 → 공격/턴 진행 확인.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add -A && git commit -m "feat: connect combat system to three.js scene"
@@ -615,7 +615,7 @@ git add -A && git commit -m "feat: connect combat system to three.js scene"
   - `class CharacterCreateUI { constructor(root: HTMLElement, onComplete: (name: string, race: RaceId, classId: ClassId) => void); show(): void; hide(): void }`
   - `styles.css`: 03번 문서의 토큰(paper/ink/forest/brass/night) 적용
 
-- [ ] **Step 1: 실패 테스트 작성**
+- [x] **Step 1: 실패 테스트 작성**
 
 ```ts
 // jsdom 환경 필요시 vitest.config.ts environment를 "jsdom"으로 변경
@@ -638,12 +638,12 @@ it("character create calls onComplete with selections", () => {
 });
 ```
 
-- [ ] **Step 2: 테스트 실패 확인**
+- [x] **Step 2: 테스트 실패 확인**
 
 Run: `pnpm test tests/ui/hud.test.ts`
 Expected: FAIL
 
-- [ ] **Step 3: 구현**
+- [x] **Step 3: 구현**
 
 `hud.ts`: `#ui` 루트에 HP/MP 바, 레벨/경험치, 스킬 슬롯, 퀘스트 트래커, 전투 시 적 HP 바를 렌더링. `update(gs)`는 `gs.getState()`를 읽어 DOM 갱신. `toast`는 3초 후 자동 제거되는 알림.
 
@@ -653,12 +653,12 @@ Expected: FAIL
 
 `app.ts` 통합: 게임 시작 시 `CharacterCreateUI.show()`, `onComplete`에서 `gs.dispatch({type:"createCharacter"})` 후 `hide()` + `hud.update` 루프 시작.
 
-- [ ] **Step 4: 테스트 통과 확인 + 수동 확인**
+- [x] **Step 4: 테스트 통과 확인 + 수동 확인**
 
 Run: `pnpm test tests/ui/hud.test.ts`
 Expected: PASS. `pnpm dev`에서 캐릭터 생성 → HUD 표시 → 이동/전투 확인.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add -A && git commit -m "feat: add DOM HUD and character creation UI"
@@ -677,7 +677,7 @@ git add -A && git commit -m "feat: add DOM HUD and character creation UI"
 - Consumes: 모든 이전 태스크.
 - Produces: 전체 코어 루프가 동작하는 프로토타입.
 
-- [ ] **Step 1: 통합 테스트 작성**
+- [x] **Step 1: 통합 테스트 작성**
 
 ```ts
 it("full core loop: create → move → combat → level → save → load", async () => {
@@ -701,7 +701,7 @@ it("full core loop: create → move → combat → level → save → load", asy
 });
 ```
 
-- [ ] **Step 2: 테스트 통과 확인**
+- [x] **Step 2: 테스트 통과 확인**
 
 Run: `pnpm test tests/integration/coreLoop.test.ts`
 Expected: PASS
@@ -716,16 +716,16 @@ Expected: PASS
 5. 레벨업 확인
 6. 세이브 후 새로고침 → 불러오기
 
-- [ ] **Step 4: README 작성**
+- [x] **Step 4: README 작성**
 
 `README.md`: 프로젝트 소개, 실행 방법(`pnpm install && pnpm dev`), 기술 스택, docs 링크, 개발 명령어.
 
-- [ ] **Step 5: 전체 검증**
+- [x] **Step 5: 전체 검증**
 
 Run: `pnpm build && pnpm test && pnpm lint`
 Expected: 모두 통과.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add -A && git commit -m "feat: complete phase 0 core loop prototype"

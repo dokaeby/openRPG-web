@@ -39,3 +39,4 @@ docs/      # 디자인 문서 00~05 + superpowers/plans (구현 계획)
 
 - 디자인 스펙: `docs/00`~`05` (한국어). 구현 상태와 다른 부분이 있으면 코드를 기준으로 문서를 수정한다.
 - 구현 계획/진행: `docs/superpowers/plans/2026-11-17-web-prototype.md` — Task 단위 체크박스로 진행 상황 추적.
+- 작업 지시문: `docs/senior-engineer-prompt.md` — 이 프로젝트에서만 사용하는 수석 엔지니어 프롬프트(각색본). 새 작업 시 기준으로 삼는다.
